@@ -8,8 +8,7 @@ OBJ = $(foreach b,$(basename $(SRC)), $s.o)
 
 # build options
 CFLAGS = $(BASE_CFLAGS) -O3 -DNDEBUG -DWEBP_HAVE_PNG -DWEBP_HAVE_JPEG -DWEBP_HAVE_TIFF -DWEBP_USE_THREAD \
-         -Wextra -Wshadow -Wall -fopenmp -flto-api=exports.txt
-
+         -Wextra -Wshadow -Wall -flto-api=exports.txt
 
 .PHONY: all
 all: $(TARGET)

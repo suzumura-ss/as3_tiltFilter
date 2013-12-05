@@ -97,7 +97,8 @@ protected:
 
   inline void colorAdd(float* rgb, float weight, int x, int y) const
   {
-    size_t ofs = (x%_width)*4+(y%_height)*_rowInBytes;
+    y = (y<0)? 0: ((y>=_height)? _height-1: y);
+    size_t ofs = (x%_width)*4+y*_rowInBytes;
     rgb[1] += weight*_src[ofs+1];
     rgb[2] += weight*_src[ofs+2];
     rgb[3] += weight*_src[ofs+3];
@@ -114,7 +115,6 @@ protected:
     colorAdd(rgb, (  ax)*(1-ay), ix+1, iy  );
     colorAdd(rgb, (1-ax)*(  ay), ix  , iy+1);
     colorAdd(rgb, (  ax)*(  ay), ix+1, iy+1);
-
     ret[0] = 255;
     ret[1] = crop(rgb[1]);
     ret[2] = crop(rgb[2]);
@@ -122,30 +122,33 @@ protected:
   }
 
 public:
-  void apply(uint8_t* dst) const
+  void apply(uint8_t* dst, int ps, int ph) const
   {
+    int dx = _width * _yaw / (2.0*M_PI);
+    double w = _width;
+    double h = _height;
+
 #ifdef _OPENMP
-    int t = omp_get_num_procs();
-    omp_set_num_threads(t/t);
+    int procs = omp_get_num_procs();
+    omp_set_num_threads(procs);
+#pragma pragma omp parallel for
 #endif
-
-    double dx = _width * _yaw / (2.0*M_PI);
-
-#pragma omp parallel for
-    for (int i = 0; i<_height; ++i) {
-      double theta0 = M_PI/2.0 - M_PI*i/_height;
+    for (int i = ps; i<ps+ph; ++i) {
+      double theta0 = M_PI / 2.0 - M_PI * i / h;
       double y0 = sin(theta0);
       double cosTheta = cos(theta0);
+      int o = i*_rowInBytes;
       for (int j = 0; j<_width; ++j) {
-        double phi0 = M_PI*2.0*j/_width;
+        double phi0 = M_PI * 2.0 * j / w;
         Vector3 p(cosTheta * cos(phi0), y0, cosTheta * sin(phi0));
         Vector3 q = _tilt*p;
         double theta = asin(q.y);
         double phi = atan2(q.z, q.x);
-        double u = phi * _width / (2.0 * M_PI);
-        double v = _height / 2.0 - theta * _height / M_PI;
-        int o = (((int)(j+dx)+_width)%_width)*4 + i*_rowInBytes;
-        sampler(&dst[o], u, v);
+        double u = phi * w / (2.0 * M_PI);
+        double v = h / 2.0 - theta * h / M_PI;
+        if (u<0) u+=_width;
+        if (v<0) v+=_height;
+        sampler(&dst[o + ((j + dx + _width)%_width)*4], u, v);
       }
     }
   }
@@ -195,7 +198,7 @@ void TiltFilter_free()
 
 
 void TiltFilter_apply() __attribute__((used,
-  annotate("as3sig:public function TiltFilter_apply(as3_self:int, as3_target:BitmapData, root:Sprite):void"),
+  annotate("as3sig:public function TiltFilter_apply(as3_self:int, as3_target:BitmapData, as3_procStart:uint, as3_procHeight:uint, root:Sprite):void"),
   annotate("as3package:info.smoche.TiltFilter"),
   annotate("as3import:flash.display.BitmapData"),
   annotate("as3import:flash.display.Sprite"),
@@ -221,14 +224,20 @@ void TiltFilter_apply()
   ");
   uint8_t* src;
   uint8_t* dst;
-  size_t width, height;
+  size_t width, height, procStart, procHeight;
   AS3_GetScalarFromVar(src, as3_src);
   AS3_GetScalarFromVar(dst, as3_dst);
   AS3_GetScalarFromVar(width, as3_width);
   AS3_GetScalarFromVar(height, as3_height);
+  AS3_GetScalarFromVar(procStart, as3_procStart);
+  AS3_GetScalarFromVar(procHeight, as3_procHeight);
+  if (procStart>=height) return;
+  if (procStart+procHeight>height) {
+    procHeight = height - procStart;
+  }
 
   self->setSource(src, width, height);
-  self->apply(dst);
+  self->apply(dst, procStart, procHeight);
 
   inline_as3("\
     ba = new ByteArray();\
