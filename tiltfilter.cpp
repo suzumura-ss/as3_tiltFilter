@@ -171,7 +171,7 @@ public:
 
 void TiltFilter_init() __attribute__((used,
   annotate("as3sig:public function TiltFilter_init(as3_yaw:Number, as3_pitch:Number, as3_roll:Number):int"),
-  annotate("as3package:info.smoche.TiltFilter")
+  annotate("as3package:info.smoche.TiltFilterBase")
 ));
 void TiltFilter_init()
 {
@@ -188,7 +188,7 @@ void TiltFilter_init()
 
 void TiltFilter_free() __attribute__((used,
   annotate("as3sig:public function TiltFilter_free(as3_self:int):void"),
-  annotate("as3package:info.smoche.TiltFilter")
+  annotate("as3package:info.smoche.TiltFilterBase")
 ));
 void TiltFilter_free()
 {
@@ -199,7 +199,7 @@ void TiltFilter_free()
 
 void TiltFilter_apply() __attribute__((used,
   annotate("as3sig:public function TiltFilter_apply(as3_self:int, as3_target:BitmapData, as3_procStart:uint, as3_procHeight:uint, root:Sprite):void"),
-  annotate("as3package:info.smoche.TiltFilter"),
+  annotate("as3package:info.smoche.TiltFilterBase"),
   annotate("as3import:flash.display.BitmapData"),
   annotate("as3import:flash.display.Sprite"),
   annotate("as3import:flash.geom.Rectangle"),

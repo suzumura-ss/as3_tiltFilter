@@ -1,5 +1,5 @@
 # base library
-TARGET = TiltFilter.swc
+TARGET = TiltFilterBase.swc
 
 # wrapper
 SRC = main.cpp tiltfilter.cpp
@@ -18,7 +18,7 @@ clean:
 	rm -f *.swf *.swc *.as3 *.abc *.o
 
 $(TARGET): $(SRC)
-	"$(FLASCC)/usr/bin/g++" $(CFLAGS) -O4 $(SRC) -emit-swc=info.smoche.TiltFilter -lFlash++ -lAS3++ -o $@
+	"$(FLASCC)/usr/bin/g++" $(CFLAGS) -O4 $(SRC) -emit-swc=info.smoche.TiltFilterBase -lFlash++ -lAS3++ -o $@
 
 include Makefile.common
 
