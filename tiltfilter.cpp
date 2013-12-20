@@ -64,20 +64,21 @@ public:
 
   void setTilt(double y, double p, double r)
   {
+    p = -p;
     _yaw = y;
     double cosP = cos(p);
     double sinP = sin(p);
     double cosR = cos(r);
     double sinR = sin(r);
-    _tilt.m11 =         cosR;
-    _tilt.m12 =        -sinR;
-    _tilt.m13 =         0.0;
-    _tilt.m21 =  cosP * sinR;
+    _tilt.m33 =         cosR;
+    _tilt.m32 =        -sinR;
+    _tilt.m31 =         0.0;
+    _tilt.m23 =  cosP * sinR;
     _tilt.m22 =  cosP * cosR;
-    _tilt.m23 =  sinP;
-    _tilt.m31 = -sinP * sinR;
-    _tilt.m32 = -sinP * cosR;
-    _tilt.m33 =  cosP;
+    _tilt.m21 =  sinP;
+    _tilt.m13 = -sinP * sinR;
+    _tilt.m12 = -sinP * cosR;
+    _tilt.m11 =  cosP;
     
   }
 
