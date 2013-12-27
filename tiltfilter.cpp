@@ -7,18 +7,15 @@
 #include <omp.h>
 
 
-class Vector3 {
-public:
+struct Vector3 {
   double x, y, z;
   Vector3(double x0=0, double y0=0, double z0=0)
   {
     x = x0;  y = y0;  z = z0;
   }
-  ~Vector3() {}
 };
 
-class Matrix3x3 {
-public:
+struct Matrix3x3 {
   double m11, m12, m13;
   double m21, m22, m23;
   double m31, m32, m33;
@@ -36,8 +33,6 @@ public:
     m21 = a21;  m22 = a22;  m23 = a23;
     m31 = a31;  m32 = a32;  m33 = a33;
   }
-
-  ~Matrix3x3() {}
 
   void identity()
   {
